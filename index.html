@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<title>
+			STEM club rush week!
+		</title>
+
+		<script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
+		<script>
+			window.onload = function () {
+				var socket = io.connect('http://thox.org');
+				var code = -1;
+				var player = null;
+
+				socket.on('connect', function () {
+					socket.emit('create client');
+				});
+
+				socket.on('unique code', function (data) {
+					code = data.code;
+					document.getElementById('codeDisplay').innerHTML = code;
+				});
+
+				socket.on('start game!', function (data) {
+					console.log('game start??');
+					player = data.player;
+					document.body.style.backgroundColor = player;
+					document.getElementById('codeDisplay').display = 'none';
+					document.getElementById('winButton').disabled = false;
+				});
+
+				document.getElementById('winButton').onclick = function () {
+					socket.emit('add some water');
+				};
+
+				socket.on('game is over!', function (data) {
+					if (data.winner === player && player !== null) {
+						alert('You win!');
+					}
+
+					document.getElementById('codeDisplay').display = 'block';
+					document.getElementById('winButton').disabled = true;
+					document.body.style.backgroundColor = 'white';
+					player = null;
+				});
+			};
+		</script>
+	</head>
+
+	<body>
+		<div id="codeDisplay"></div>
+		<button id="winButton" disabled>Win</button>
+	</body>
+</html>

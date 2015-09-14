@@ -1,0 +1,37 @@
+#redPlayerContainer, #bluePlayerContainer {
+	position: absolute;
+
+	width: 206.25px;
+	height: 800px;
+
+	border: 1px solid black;
+}
+
+#redPlayerContainer {
+	left: 0;
+	top: 0;
+}
+
+#redPlayerFill {
+	position: absolute;
+	background-color: red;
+	width: 206.25px;
+}
+
+#bluePlayerFill {
+	position: absolute;
+	background-color: blue;
+	width: 206.25px;
+}
+
+#bluePlayerContainer {
+	left: 215px;
+	top: 0;
+}
+
+#contentPane {
+	position: absolute;
+	left: 430px;
+	height: 800px;
+	width: 600px;
+}
