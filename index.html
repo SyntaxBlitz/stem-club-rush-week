@@ -64,7 +64,7 @@
 						tdList[i].innerHTML = (i + 1);
 						tdList[i].style.backgroundColor = '';
 						(function (i) {
-							tdList[i].ontouchstart = function () {
+							var onTouch = function () {
 								if (i === currentClick) {
 									tdList[i].style.backgroundColor = 'white';
 									currentClick++;
@@ -79,6 +79,11 @@
 									}, 500);
 								}
 							};
+							if ('ontouchstart' in document.documentElement) {
+								tdList[i].ontouchstart = onTouch;
+							} else {
+								tdList[i].onclick = onTouch;
+							}
 						})(i)
 					}
 
