@@ -11,7 +11,7 @@
 		<script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
 		<script>
 			var MAX_WATER = 438;	// 2.0625 in by 8 in
-			var secondsToComplete = 20;
+			var secondsToComplete = 30;
 
 			var setWaterLevel = function (player, level) {
 				var element = null;
@@ -95,7 +95,8 @@
 			};
 
 			var getCompletionsToWinForSeconds = function (seconds) {
-				return seconds;
+				// based on a trial of 50
+				return Math.ceil(seconds / 3.4);
 			}
 		</script>
 	</head>
