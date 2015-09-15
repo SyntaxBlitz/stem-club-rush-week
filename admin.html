@@ -71,6 +71,8 @@
 					document.getElementById('secondsToCompleteBox').disabled = true;
 
 					document.getElementById('winner').innerHTML = '';
+					setWaterLevel('red', 0);
+					setWaterLevel('blue', 0);
 				});
 
 				socket.on('game is over!', function (data) {
