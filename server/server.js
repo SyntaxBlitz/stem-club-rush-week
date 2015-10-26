@@ -12,10 +12,18 @@ app.get('/admin', function (req, res) {
 	res.sendFile(__dirname + '/admin.html');
 });
 
+var DudSocket = function () {
+	return {
+		emit: function () {},
+		dud: true
+	};
+};
+
 var lastCode = 0;
 
 var gameClients = [];
-var adminClient = null;
+var adminClient = DudSocket();
+var rpi = DudSocket();
 
 var completionsToWin = -1;
 
@@ -51,6 +59,8 @@ io.on('connection', function (socket) {
 		}
 
 		adminClient.emit('water state update', {redWater: redWater, blueWater: blueWater});
+		console.log('add water');
+		rpi.emit('add water', {player: (socket === redPlayer? 'red' : 'blue')});
 
 		var winner = null;
 		if (Math.ceil(redWater) >= MAX_WATER) winner = 'red';
@@ -70,11 +80,22 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('admin auth', function (data) {
-		console.log('auth attempt')
+		console.log('auth attempt');
 		if (data.password === 'stem-rush-thox') {
-			console.log('auth success')
+			console.log('auth success');
 			adminClient = socket;
-			adminClient.emit('authed successfully :)');
+			var rpiConnected = rpi.dud === undefined;
+			adminClient.emit('authed successfully :)', {rpiConnected: rpiConnected});
+		}
+	});
+
+	socket.on('rpi auth', function (data) {
+		console.log('rpi connected?');
+		if (data.password === 'I AM A RASPBERRY PI') {
+			console.log('rpi connected!');
+			rpi = socket;
+			rpi.emit('authed :D');
+			adminClient.emit('rpi connected');
 		}
 	});
 
@@ -84,6 +105,8 @@ io.on('connection', function (socket) {
 		if (started)
 			return;
 		if (completionsToWin === -1)
+			return;
+		if (rpi.dud)
 			return;
 
 		var redPlayerMaybe = null;
@@ -129,6 +152,8 @@ io.on('connection', function (socket) {
 		if (!started)
 			return;
 
+		rpi.emit('EMERGENCY STOP JESUS SHUT IT ALL DOWN');
+
 		io.emit('game is over!', {winner: null});	// send to ALL clients, in case one of them is stuck
 		
 		started = false;
@@ -140,7 +165,11 @@ io.on('connection', function (socket) {
 
 	socket.on('disconnect', function () {
 		if (socket === adminClient) {
-			adminClient = null;
+			adminClient = DudSocket();
+		} else if (socket === rpi) {
+			console.log('rpi disconnected');
+			adminClient.emit('rpi disconnected');
+			rpi = DudSocket();
 		} else {
 			for (var i = 0; i < gameClients.length; i++) {
 				if (gameClients[i].socket === socket) {

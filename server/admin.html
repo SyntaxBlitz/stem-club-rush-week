@@ -36,10 +36,11 @@
 					};
 				});
 
-				socket.on('authed successfully :)', function () {
+				socket.on('authed successfully :)', function (data) {
 					document.getElementById('auth').style.display = 'none';
 					document.getElementById('everythingElse').style.display = 'block';
-					
+					document.getElementById('rpiConnected').innerHTML = 'Raspberry pi is ' + (data.rpiConnected? '' : 'not') + ' connected';
+
 					socket.emit('admin change completions to win', {
 						completionsToWin: getCompletionsToWinForSeconds(secondsToComplete)
 					});
@@ -65,26 +66,25 @@
 				};
 
 				socket.on('start game!', function () {
-					document.getElementById('redIDBox').disabled = true;
-					document.getElementById('blueIDBox').disabled = true;
-					document.getElementById('startGameButton').disabled = true;
-					document.getElementById('secondsToCompleteBox').disabled = true;
+					setDisabled(true);
 
 					document.getElementById('winner').innerHTML = '';
-					setWaterLevel('red', 0);
-					setWaterLevel('blue', 0);
 				});
 
 				socket.on('game is over!', function (data) {
-					document.getElementById('redIDBox').disabled = false;
-					document.getElementById('blueIDBox').disabled = false;
-					document.getElementById('startGameButton').disabled = false;
-					document.getElementById('secondsToCompleteBox').disabled = false;
+					setDisabled(false);
 
 					if (data.winner) {
 						document.getElementById('winner').innerHTML = data.winner + ' wins';
 					}
 				});
+
+				var setDisabled = function (disabled) {
+					document.getElementById('redIDBox').disabled = disabled;
+					document.getElementById('blueIDBox').disabled = disabled;
+					document.getElementById('startGameButton').disabled = disabled;
+					document.getElementById('secondsToCompleteBox').disabled = disabled;
+				};
 
 				document.getElementById('eStopButton').onclick = function () {
 					socket.emit('admin e-stop');
@@ -93,6 +93,14 @@
 				socket.on('water state update', function (data) {
 					setWaterLevel('red', data.redWater);
 					setWaterLevel('blue', data.blueWater);
+				});
+
+				socket.on('rpi connected', function (data) {
+					document.getElementById('rpiConnected').innerHTML = 'Raspberry pi is connected';
+				});
+
+				socket.on('rpi disconnected', function (data) {
+					document.getElementById('rpiConnected').innerHTML = 'Raspberry pi is not connected';
 				});
 			};
 
@@ -120,6 +128,7 @@
 				</div>
 				<div id="winner"></div>
 				<button id="eStopButton">E-stop</button>
+				<div id="rpiConnected"></div>
 			</div>
 		</div>
 	</body>
